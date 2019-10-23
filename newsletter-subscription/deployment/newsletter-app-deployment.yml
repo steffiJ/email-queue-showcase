@@ -5,7 +5,7 @@ metadata:
   labels:
     app: newsletter-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: newsletter-app
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: newsletter-subscription
-          image: steffiengel/newsletter-subscription:latest
+          image: steffiengel/newsletter-subscription:0.4
           ports:
             - containerPort: 8080

@@ -5,7 +5,7 @@ services:
   newsletter-subscription:
     container_name: "newsletter-subscription_service"
     build: "./newsletter-subscription"
-    image: steffiengel/newsletter-subscription:latest
+    image: steffiengel/newsletter-subscription:0.1
     depends_on:
       - newsletter-subscription_db
       - newsletter-subscription_queue
