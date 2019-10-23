@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newsletter-db-deployment
+  labels:
+    app: newsletter-db
+spec:
+  selector:
+    matchLabels:
+      app: newsletter-db
+
+  template:
+    metadata:
+      labels:
+        app: newsletter-db
+    spec:
+      containers:
+        - name: newsletter-subscription-db
+          image: postgres:10
+          env:
+            - name: POSTGRES_DB
+              value: newsletter_subscription
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 5432

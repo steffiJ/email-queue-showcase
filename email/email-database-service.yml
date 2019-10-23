@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-db-service
+  labels:
+    app: email-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      protocol: TCP
+  selector:
+    app: email-db

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: subscriber-zookeeper-service
+  labels:
+    app: subscriber-zookeeper
+spec:
+  type: NodePort
+  ports:
+    - port: 2181
+      protocol: TCP
+  selector:
+    app: subscriber-zookeeper

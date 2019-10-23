@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newsletter-deployment
+  labels:
+    app: newsletter-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: newsletter-app
+  template:
+    metadata:
+      labels:
+        app: newsletter-app
+    spec:
+      containers:
+        - name: newsletter-subscription
+          image: steffiengel/newsletter-subscription:latest
+          ports:
+            - containerPort: 8080

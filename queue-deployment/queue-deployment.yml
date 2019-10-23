@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriber-queue-deployment
+  labels:
+    app: subscriber-queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subscriber-queue
+  template:
+    metadata:
+      labels:
+        app: subscriber-queue
+    spec:
+      containers:
+        - name: subscriber-queue
+          image: confluentinc/cp-kafka:5.0.1
+          env:
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: "newsletter-subscription-zookeeper:2181"
+          - name: KAFKA_LISTENERS
+            value: "PLAINTEXT://newsletter-subscription_queue:9092,PLAINTEXT_HOST://:19092"
+          - name: KAFKA_ADVERTISED_LISTENERS
+            value: "PLAINTEXT://newsletter-subscription_queue:9092,PLAINTEXT_HOST://localhost:19092"
+          - name: ALLOW_PLAINTEXT_LISTENER
+            value: "yes"
+          - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+            value: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+          - name: KAFKA_INTER_BROKER_LISTENER_NAME
+            value: "PLAINTEXT"
+          - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+            value: "1"
+          ports:
+            - containerPort: 9092

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-db-deployment
+  labels:
+    app: email-db
+spec:
+  selector:
+    matchLabels:
+      app: email-db
+
+  template:
+    metadata:
+      labels:
+        app: email-db
+    spec:
+      containers:
+        - name: email-db
+          image: postgres:10
+          env:
+            - name: POSTGRES_DB
+              value: email
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 5432

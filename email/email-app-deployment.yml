@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-deployment
+  labels:
+    app: email-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: email-app
+  template:
+    metadata:
+      labels:
+        app: email-app
+    spec:
+      containers:
+        - name: email
+          image: steffiengel/email:latest
+          ports:
+            - containerPort: 8080

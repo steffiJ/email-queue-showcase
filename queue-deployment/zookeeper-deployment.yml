@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriber-zookeeper-deployment
+  labels:
+    app: subscriber-zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: subscriber-zookeeper
+
+  template:
+    metadata:
+      labels:
+        app: subscriber-zookeeper
+    spec:
+      containers:
+        - name: subscriber-zookeeper
+          image: confluentinc/cp-zookeeper:5.0.1
+          env:
+          - name: ZOOKEEPER_CLIENT_PORT
+            value: "2181"
+          ports:
+            - containerPort: 2181

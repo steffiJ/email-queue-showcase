@@ -1,0 +1,109 @@
+version: '3'
+
+services:
+
+  newsletter-subscription:
+    container_name: "newsletter-subscription_service"
+    build: "./newsletter-subscription"
+    image: steffiengel/newsletter-subscription:latest
+    depends_on:
+      - newsletter-subscription_db
+      - newsletter-subscription_queue
+    networks:
+      - newsletter-subscription_network
+    ports:
+      - 8080:8080
+
+  newsletter-subscription_db:
+    container_name: "newsletter-subscription-db"
+    image: postgres:10
+    volumes:
+      - "newsletter-subscription_db-data:/postgres"
+    ports:
+      - 15432:5432
+    networks:
+      - newsletter-subscription_network
+    environment:
+      PGDATA: "/postgres/db"
+      POSTGRES_DB: "newsletter_subscription"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+
+  email:
+    container_name: "email_service"
+    build: "./email"
+    image: steffiengel/email:latest
+    depends_on:
+      - email_db
+      - newsletter-subscription_queue
+    networks:
+      - newsletter-subscription_network
+    ports:
+      - 8081:8080
+
+  email_db:
+    container_name: "email_db"
+    image: postgres:10
+    volumes:
+      - "email_db-data:/postgres"
+    ports:
+      - 25432:5432
+    networks:
+      - newsletter-subscription_network
+    environment:
+      PGDATA: "/postgres/db"
+      POSTGRES_DB: "email"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+
+
+  # tt-data-store_kafka ports/connections:
+  #
+  # @hint: PLAINTEXT vs PLAINTEXT_HOST
+  # We want to make kafka reachable from within the docker containers, but also directly from the host.
+  # With this config, we allow both options (different ports, see below)
+  #
+  # Connect from inside docker container:     newsletter-subscription_queue:9092
+  # Connect from host:                        localhost:19092
+
+  newsletter-subscription_queue:
+    container_name: "newsletter-subscription_queue"
+    image: "confluentinc/cp-kafka:5.0.1"
+    depends_on:
+      - newsletter-subscription_zookeeper
+    ports:
+      - 9092:9092
+    networks:
+      - newsletter-subscription_network
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "newsletter-subscription_zookeeper:2181"
+      KAFKA_LISTENERS: "PLAINTEXT://newsletter-subscription_queue:9092,PLAINTEXT_HOST://:19092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://newsletter-subscription_queue:9092,PLAINTEXT_HOST://localhost:19092"
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+  newsletter-subscription_zookeeper:
+    container_name: "newsletter-subscription_zookeeper"
+    image: "confluentinc/cp-zookeeper:5.0.1"
+    ports:
+      - 2181:2181
+    networks:
+      - newsletter-subscription_network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+
+#
+# Networks
+#
+networks:
+  newsletter-subscription_network:
+
+#
+# Volumes
+#
+volumes:
+  newsletter-subscription_db-data:
+  email_db-data:
